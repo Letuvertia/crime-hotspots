@@ -1,21 +1,25 @@
 import numpy as  np
 import random
 import plot_map
-T = 100         # How many days to simulate
+
+T = 2         # How many days to simulate
 
 class Burglar:
     def __init__(self,x,y):
         self.s = (x,y) 
         self.active = True
 
+
 class Discrete_Model:
     l = 1               # Grid spacing
-    omega = 1/15        # Dynamic attractiveness decay rate
-    Ata = 0.2             # Measures neighborhood effects (ranging from0 to 1)
-    theta = 0.56        # Increase in attractiveness due to one burglary event
-    A0 = 1/30           # ???
-    Gamma = 0.019       # Rate of burglar generation at each site
     dt = 1/100          # Time step
+    omega = 1/15        # Dynamic attractiveness decay rate
+    A0 = 1/30           # ???
+
+    eta = 0.2           # Measures neighborhood effects (ranging from 0 to 1)
+    theta = 0.56        # Increase in attractiveness due to one burglary event
+    Gamma = 0.019       # Rate of burglar generation at each site
+    
     grid_num = 128
 
     def __init__(self):
@@ -35,6 +39,7 @@ class Discrete_Model:
 
         self.B *= self.B_bar
         self.As0 *= self.A0
+        self.A = self.As0 + self.B
     
     def go_burgle(self,s):
         p = 1 - np.e ** ( -self.A[s] * self.dt )
@@ -44,7 +49,7 @@ class Discrete_Model:
     def create_burglar(self):
         'return True or False by randomly'
         if random.random() < self.Gamma: return True
-        else: return True
+        else: return False
 
     def move_to(self,s):
         x,y = s
@@ -94,7 +99,7 @@ class Discrete_Model:
                         sigma += self.B[x+dir[0],y+dir[1]]
                         z += 1
 
-                B_tmp[x,y] = ((1-self.Ata) * self.B[x,y] + self.Ata* (sigma / z)) * (1 - self.omega * self.dt ) + self.theta * E[x,y]
+                B_tmp[x,y] = ((1-self.eta) * self.B[x,y] + self.eta* (sigma / z)) * (1 - self.omega * self.dt ) + self.theta * E[x,y]
             
         self.B = B_tmp
         
@@ -105,15 +110,14 @@ class Discrete_Model:
                     self.burglar_list.append( Burglar(x,y) )
 
 if __name__ == "__main__":
-    model = Discrete_Model()    
+    model = Discrete_Model()
+    plotter = plot_map.Plot2DArray()
     t = 0
-    c = 0
+    # c = 0
     while t < T:
         model.simulate(t)
         t += model.dt
-        if t >= c:
-            # print(c)
-            # print(model.A)
-            plotter = plot_map.Plot2DArray()
-            plotter.plot_map(model.A, c)
-            c += 1
+        plotter.plot_map(model.A, t)
+        # c += 1
+    plotter.save_gif()
+    plotter.save_mp4()

@@ -27,14 +27,15 @@ class Plot2DArray(object):
             the color set for meshcolor.
             you can choose the one you like at https://matplotlib.org/stable/tutorials/colors/colormaps.html
         """
-        title = "t = {}".format(t)
+        title = "t = {:.3f}".format(t)
         output_path = os.path.join(os.getcwd(), self.output_dir, self.time)
-        filename = "simulation_{}_t_{}.png".format(self.time, t)
+        filename = "simulation_{}_t_{:.3f}.png".format(self.time, t)
         plt.figure(figsize=figure_size, dpi=80)
         plt.title(title)
         plt.imshow(map, cmap=cmap)
-        plt.colorbar(orientation='vertical')
+        plt.colorbar()
         self.plotted_img_paths.append(self._save_fig(output_path, filename, t))
+        plt.close()
     
 
     def _save_fig(self, output_path, fn, t):
@@ -46,27 +47,44 @@ class Plot2DArray(object):
         return file_path
 
     
-    def save_gif(self, fps=30):
+    def save_gif(self, fps=30, img_dir=""):
         filename = "simulation_{}.gif".format(self.time)
         file_path = os.path.join(os.getcwd(), self.output_dir, filename)
-        images = [imageio.imread(img_path) for img_path in self.plotted_img_paths]
+        
+        # img paths
+        all_img_paths = self.plotted_img_paths
+        if img_dir:
+            all_img_paths = [os.path.join(img_dir, f) for f in os.listdir(img_dir) if os.path.isfile(os.path.join(img_dir, f))]
+
+        images = [imageio.imread(img_path) for img_path in all_img_paths]
         imageio.mimsave(file_path, images, duration=1/fps)
         print("gif saved to {}".format(file_path))
 
     
-    def save_mp4(self, fps=30):
+    def save_mp4(self, fps=30, img_dir=""):
         filename = "simulation_{}.mp4".format(self.time)
         file_path = os.path.join(os.getcwd(), self.output_dir, filename)
+
+        # img paths
+        all_img_paths = self.plotted_img_paths
+        if img_dir:
+            all_img_paths = [os.path.join(img_dir, f) for f in os.listdir(img_dir) if os.path.isfile(os.path.join(img_dir, f))]
+        
         writer = imageio.get_writer(file_path, fps=20)
-        for img_path in self.plotted_img_paths:
+        for img_path in all_img_paths:
             writer.append_data(imageio.imread(img_path))
         writer.close()
         print("mp4 saved to {}".format(file_path))
 
 
 
-
 if __name__ == "__main__":
+    img_dir = os.path.join(os.getcwd(), 'imgfiles', '07_23_16_58')
+    plotter = Plot2DArray()
+    plotter.save_gif(img_dir=img_dir)
+    plotter.save_mp4(img_dir=img_dir)
+
+    '''
     # usage example
     t = 60
     lots_of_data = np.random.randint(256, size=(t, 128, 128))
@@ -75,3 +93,5 @@ if __name__ == "__main__":
         plotter.plot_map(lots_of_data[i], i)
     plotter.save_gif()
     plotter.save_mp4()
+    '''
+    
