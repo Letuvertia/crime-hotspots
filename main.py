@@ -1,5 +1,6 @@
 import numpy as  np
 import random
+import plot_map
 T = 100         # How many days to simulate
 
 class Burglar:
@@ -111,7 +112,8 @@ if __name__ == "__main__":
         model.simulate(t)
         t += model.dt
         if t >= c:
+            # print(c)
+            # print(model.A)
+            plotter = plot_map.Plot2DArray()
+            plotter.plot_map(model.A, c)
             c += 1
-            print(c)
-            print(model.A)
-        
