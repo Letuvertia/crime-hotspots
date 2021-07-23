@@ -88,6 +88,7 @@ if __name__ == "__main__":
     plotter = Plot2DArray()
     plotter.save_gif(img_dir=img_dir)
     plotter.save_mp4(img_dir=img_dir)
+    
 
     '''
     # usage example
