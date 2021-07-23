@@ -67,7 +67,7 @@ class Plot2DArray(object):
 
 
 if __name__ == "__main__":
-    # Usage example
+    # usage example
     t = 60
     lots_of_data = np.random.randint(256, size=(t, 128, 128))
     plotter = Plot2DArray()
