@@ -6,10 +6,14 @@ import datetime
 
 
 class Plot2DArray(object):
-    def __init__(self, output_dir="imgfiles"):
+    def __init__(self, filename_prefix="", output_dir="imgfiles"):
         super().__init__()
-        # use current time as filename
-        self.time = datetime.datetime.now().strftime('%m_%d_%H_%M')
+
+        # use the current time as filename if not specified
+        if filename_prefix:
+            self.filename_prefix = filename_prefix
+        else:
+            self.filename_prefix = "simulation_{}".format(datetime.datetime.now().strftime('%m_%d_%H_%M'))
         self.output_dir=output_dir
 
         self.max_digit = 4
@@ -28,8 +32,9 @@ class Plot2DArray(object):
             you can choose the one you like at https://matplotlib.org/stable/tutorials/colors/colormaps.html
         """
         title = "t = {:.3f}".format(t)
-        output_path = os.path.join(os.getcwd(), self.output_dir, self.time)
-        filename = "simulation_{}_t_{:.3f}.png".format(self.time, t)
+        output_path = os.path.join(os.getcwd(), self.output_dir, self.filename_prefix)
+        filename = "{}_{:.3f}.png".format(self.filename_prefix, t)
+        
         plt.figure(figsize=figure_size, dpi=80)
         plt.title(title)
         plt.imshow(map, cmap=cmap)
@@ -48,7 +53,7 @@ class Plot2DArray(object):
 
     
     def save_gif(self, fps=30, img_dir=""):
-        filename = "simulation_{}.gif".format(self.time)
+        filename = "{}.gif".format(self.filename_prefix)
         file_path = os.path.join(os.getcwd(), self.output_dir, filename)
         
         # img paths
@@ -62,7 +67,7 @@ class Plot2DArray(object):
 
     
     def save_mp4(self, fps=30, img_dir=""):
-        filename = "simulation_{}.mp4".format(self.time)
+        filename = "{}.gif".format(self.filename_prefix)
         file_path = os.path.join(os.getcwd(), self.output_dir, filename)
 
         # img paths

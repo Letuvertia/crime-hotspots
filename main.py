@@ -1,55 +1,99 @@
+import argparse
 import numpy as  np
 import random
-import plot_map
 
-T = 2         # How many days to simulate
+from plot_map import Plot2DArray
 
-class Burglar:
+
+class Burglar(object):
     def __init__(self,x,y):
         self.s = (x,y) 
         self.active = True
 
 
-class Discrete_Model:
-    l = 1               # Grid spacing
-    dt = 1/100          # Time step
-    omega = 1/15        # Dynamic attractiveness decay rate
-    A0 = 1/30           # ???
+class Discrete_Model(object):
+    """
+    This class impelements the discrete model proposed by Short et al. (2008), simulating 
+    crime hotspots spatial development. 
+    """
 
-    eta = 0.2           # Measures neighborhood effects (ranging from 0 to 1)
-    theta = 0.56        # Increase in attractiveness due to one burglary event
-    Gamma = 0.019       # Rate of burglar generation at each site
+    def __init__(self, args, random_seed=6000):
+        super.__init__()
+        random.seed(random_seed)
+        self.init_params(args)
+        self.init_grid(args)
+        self.init_burglar(args)
+        
+
+    @staticmethod
+    def setup_paper_params(args):
+        """
+        the parameters proposed in the paper for the experiments of Fig.3
+        """
+        if args.expset == 'a':
+            args.eta = 0.2
+            args.theta = 0.56
+            args.Gamma = 0.019
+        if args.expset == 'b':
+            args.eta = 0.2
+            args.theta = 5.6
+            args.Gamma = 0.002
+        if args.expset == 'c':
+            args.eta = 0.03
+            args.theta = 0.56
+            args.Gamma = 0.019
+        if args.expset == 'd':
+            args.eta = 0.03
+            args.theta = 5.6
+            args.Gamma = 0.002
+        return args
+
     
-    grid_num = 128
+    def init_params(self, args):
+        self.l = args.l
+        self.dt = args.dt
+        self.omega = args.omega
+        self.A0 = args.A0
+        self.eta = args.eta
+        self.theta = args.theta
+        self.Gamma = args.Gamma
+        self.grid_num = args.grid_num
 
-    def __init__(self):
-        self.A = np.empty((self.grid_num,self.grid_num))
-        self.B = np.ones((self.grid_num,self.grid_num))
-        self.n = np.empty((self.grid_num,self.grid_num))
-        self.p = np.empty((self.grid_num,self.grid_num))
-        self.As0 = np.ones((self.grid_num,self.grid_num))
+        # initial value of B_s(0) of every lattice s 
         self.B_bar = (self.theta * self.Gamma / self.omega)
+
+        # initial # of burglar in every lattice
         self.N_bar = (self.Gamma * self.dt) / (1 - np.e**( -self.A0 * self.dt ))
 
+
+    def init_grid(self, args):
+        grid_size = (self.grid_num, self.grid_num)
+        self.A = np.empty(grid_size)
+        self.As0 = np.ones((self.grid_num,self.grid_num)) * self.A0
+        self.B = np.ones(grid_size) * self.B_bar
+        
+
+    def init_burglar(self, args):
         self.burglar_list = []
         for x in range(self.grid_num):
             for y in range (self.grid_num):
                 for _ in range( int(self.N_bar) ):
                     self.burglar_list.append( Burglar(x,y) )
 
-        self.B *= self.B_bar
-        self.As0 *= self.A0
-        self.A = self.As0 + self.B
-    
+
     def go_burgle(self,s):
         p = 1 - np.e ** ( -self.A[s] * self.dt )
         if random.random() < p : return True
         else: return False
 
+
     def create_burglar(self):
-        'return True or False by randomly'
+        """
+        return True or False base on a constant rate Gamma
+        """
         if random.random() < self.Gamma: return True
         else: return False
+
 
     def move_to(self,s):
         x,y = s
@@ -68,7 +112,8 @@ class Discrete_Model:
             if chose < cnt:
                 return (x+dir[0], y+dir[1])        
 
-    def simulate(self,t): # Now is time t.
+
+    def simulate(self, t): # Now is time t.
         #step 0: update attractiveness by last state
         self.A = self.As0 + self.B
 
@@ -109,15 +154,47 @@ class Discrete_Model:
                 if self.create_burglar():
                     self.burglar_list.append( Burglar(x,y) )
 
+
+
+
 if __name__ == "__main__":
-    model = Discrete_Model()
-    plotter = plot_map.Plot2DArray()
+
+    # parameters
+    parser = argparse.ArgumentParser()
+    ## the param sets for experiment a~d of Fig.3 in the paper (Short, 2008)
+    parser.add_argument('--expset', type=str, default='', help='valid input: a, b, c, d.')
+
+    ## param for the model
+    parser.add_argument('--T', type=int, default=200, help='How many days to simulate')
+    parser.add_argument('--grid_num', type=int, default=128, help='')
+    parser.add_argument('--l', type=int, default=1, help='Grid spacing')
+    parser.add_argument('--dt', type=float, default=1/100, help='Time step')
+    parser.add_argument('--omega', type=float, default=1/15, help='Dynamic attractiveness decay rate')
+    parser.add_argument('--A0', type=float, default=1/30, help='???')
+    parser.add_argument('--eta', type=float, default=0.03, help='Measures neighborhood effects (ranging from 0 to 1)')
+    parser.add_argument('--theta', type=int, default=0.56, help='Increase in attractiveness due to one burglary event')
+    parser.add_argument('--Gamma', type=int, default=0.002, help='Rate of burglar generation at each site')
+    
+    ## additional param
+    parser.add_argument('--plot_rate', type=int, default=0.1, help='plot the fig every plot_rate days')
+    
+    args = parser.parse_args()
+
+    # setup
+    args = Discrete_Model.setup_paper_params(args)
+    filename_prefix = "eta_{}_theta_{}_Gamma_{}".format(args.eta, args.theta, args.Gamma) if args.expset else ""
+
+    model = Discrete_Model(args)
+    plotter = Plot2DArray(filename_prefix=filename_prefix)
+
+    # start simulation
     t = 0
-    # c = 0
-    while t < T:
+    c = 0
+    while t < args.T:
         model.simulate(t)
-        t += model.dt
-        plotter.plot_map(model.A, t)
-        # c += 1
+        t += args.dt
+        if t >= c:
+            plotter.plot_map(model.A, t)
+            c += args.plot_rate
     plotter.save_gif()
     plotter.save_mp4()
