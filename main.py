@@ -169,16 +169,16 @@ if __name__ == "__main__":
     ## param for the model
     parser.add_argument('--T', type=int, default=200, help='How many days to simulate')
     parser.add_argument('--grid_num', type=int, default=128, help='')
-    parser.add_argument('--l', type=int, default=1, help='Grid spacing')
+    parser.add_argument('--l', type=float, default=1, help='Grid spacing')
     parser.add_argument('--dt', type=float, default=1/100, help='Time step')
     parser.add_argument('--omega', type=float, default=1/15, help='Dynamic attractiveness decay rate')
     parser.add_argument('--A0', type=float, default=1/30, help='???')
     parser.add_argument('--eta', type=float, default=0.03, help='Measures neighborhood effects (ranging from 0 to 1)')
-    parser.add_argument('--theta', type=int, default=0.56, help='Increase in attractiveness due to one burglary event')
-    parser.add_argument('--Gamma', type=int, default=0.002, help='Rate of burglar generation at each site')
+    parser.add_argument('--theta', type=float, default=0.56, help='Increase in attractiveness due to one burglary event')
+    parser.add_argument('--Gamma', type=float, default=0.002, help='Rate of burglar generation at each site')
     
     ## additional param
-    parser.add_argument('--plot_rate', type=int, default=1, help='plot the fig every plot_rate days')
+    parser.add_argument('--plot_rate', type=float, default=1., help='plot the fig every plot_rate days')
     args = parser.parse_args()
 
     # setup
