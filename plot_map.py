@@ -67,7 +67,7 @@ class Plot2DArray(object):
 
     
     def save_mp4(self, fps=30, img_dir=""):
-        filename = "{}.gif".format(self.filename_prefix)
+        filename = "{}.mp4".format(self.filename_prefix)
         file_path = os.path.join(os.getcwd(), self.output_dir, filename)
 
         # img paths
