@@ -18,11 +18,13 @@ class Discrete_Model(object):
     """
 
     def __init__(self, args, random_seed=6000):
-        super.__init__()
+        super().__init__()
         random.seed(random_seed)
         self.init_params(args)
         self.init_grid(args)
         self.init_burglar(args)
+
+        print('args: {}'.format(args))
         
 
     @staticmethod
@@ -176,13 +178,12 @@ if __name__ == "__main__":
     parser.add_argument('--Gamma', type=int, default=0.002, help='Rate of burglar generation at each site')
     
     ## additional param
-    parser.add_argument('--plot_rate', type=int, default=0.1, help='plot the fig every plot_rate days')
-    
+    parser.add_argument('--plot_rate', type=int, default=1, help='plot the fig every plot_rate days')
     args = parser.parse_args()
 
     # setup
     args = Discrete_Model.setup_paper_params(args)
-    filename_prefix = "eta_{}_theta_{}_Gamma_{}".format(args.eta, args.theta, args.Gamma) if args.expset else ""
+    filename_prefix = "expset({})_eta_{}_theta_{}_Gamma_{}".format(args.expset, args.eta, args.theta, args.Gamma) if args.expset else ""
 
     model = Discrete_Model(args)
     plotter = Plot2DArray(filename_prefix=filename_prefix)
