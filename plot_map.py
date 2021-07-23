@@ -37,7 +37,7 @@ class Plot2DArray(object):
         
         plt.figure(figsize=figure_size, dpi=80)
         plt.title(title)
-        plt.imshow(map, cmap=cmap)
+        plt.imshow(map, vmin=0, vmax=32, cmap=cmap)
         plt.colorbar()
         self.plotted_img_paths.append(self._save_fig(output_path, filename, t))
         plt.close()
@@ -52,7 +52,7 @@ class Plot2DArray(object):
         return file_path
 
     
-    def save_gif(self, fps=30, img_dir="", args=None):
+    def save_gif(self, fps=30, img_dir=""):
         filename = "{}.gif".format(self.filename_prefix)
         file_path = os.path.join(os.getcwd(), self.output_dir, filename)
         
@@ -68,7 +68,7 @@ class Plot2DArray(object):
         print("gif saved to {}".format(file_path))
 
     
-    def save_mp4(self, fps=30, img_dir="", args=None):
+    def save_mp4(self, fps=30, img_dir=""):
         filename = "{}.mp4".format(self.filename_prefix)
         file_path = os.path.join(os.getcwd(), self.output_dir, filename)
 

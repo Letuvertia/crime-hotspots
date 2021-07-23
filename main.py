@@ -178,21 +178,23 @@ if __name__ == "__main__":
 
     # setup
     args = Discrete_Model.setup_paper_params(args)
-    filename_prefix = "expset({})_eta_{}_theta_{}_Gamma_{}".format(args.expset, args.eta, args.theta, args.Gamma) if args.expset else ""
+    filename_prefix = "expset({})_eta_{}_theta_{}_Gamma_{}_pr_{}".format(args.expset, args.eta, args.theta, args.Gamma, args.plot_rate) if args.expset else ""
 
     model = Discrete_Model(args)
     plotter = Plot2DArray(filename_prefix=filename_prefix)
 
     
     # start simulation
-    # t = 0
-    # c = 0
-    # while t < args.T:
-    #     model.simulate(t)
-    #     t += args.dt
-    #     if t >= c:
-    #         plotter.plot_map(model.A, t)
-    #         c += args.plot_rate
-    img_dir = os.path.join(os.getcwd(), 'imgfiles', filename_prefix)
-    plotter.save_gif(img_dir=img_dir, args=args)
-    plotter.save_mp4(img_dir=img_dir, args=args)
+    t = 0
+    c = 0
+    while t < args.T:
+        model.simulate(t)
+        t += args.dt
+        if t >= c:
+            plotter.plot_map(model.A, t)
+            c += args.plot_rate
+    plotter.save_gif()
+    plotter.save_mp4()
+    # img_dir = os.path.join(os.getcwd(), 'imgfiles', filename_prefix)
+    # plotter.save_gif(img_dir=img_dir)
+    # plotter.save_mp4(img_dir=img_dir)
