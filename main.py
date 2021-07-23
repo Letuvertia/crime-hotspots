@@ -1,5 +1,6 @@
 import argparse
 import numpy as  np
+import os
 import random
 
 from plot_map import Plot2DArray
@@ -182,14 +183,16 @@ if __name__ == "__main__":
     model = Discrete_Model(args)
     plotter = Plot2DArray(filename_prefix=filename_prefix)
 
+    
     # start simulation
-    t = 0
-    c = 0
-    while t < args.T:
-        model.simulate(t)
-        t += args.dt
-        if t >= c:
-            plotter.plot_map(model.A, t)
-            c += args.plot_rate
-    # plotter.save_gif()
-    # plotter.save_mp4()
+    # t = 0
+    # c = 0
+    # while t < args.T:
+    #     model.simulate(t)
+    #     t += args.dt
+    #     if t >= c:
+    #         plotter.plot_map(model.A, t)
+    #         c += args.plot_rate
+    img_dir = os.path.join(os.getcwd(), 'imgfiles', filename_prefix)
+    plotter.save_gif(img_dir=img_dir, args=args)
+    plotter.save_mp4(img_dir=img_dir, args=args)

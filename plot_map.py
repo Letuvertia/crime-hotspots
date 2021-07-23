@@ -52,28 +52,33 @@ class Plot2DArray(object):
         return file_path
 
     
-    def save_gif(self, fps=30, img_dir=""):
+    def save_gif(self, fps=30, img_dir="", args=None):
         filename = "{}.gif".format(self.filename_prefix)
         file_path = os.path.join(os.getcwd(), self.output_dir, filename)
         
         # img paths
         all_img_paths = self.plotted_img_paths
         if img_dir:
-            all_img_paths = [os.path.join(img_dir, f) for f in os.listdir(img_dir) if os.path.isfile(os.path.join(img_dir, f))]
+            filename_prefix = os.path.split(img_dir)[-1]
+            all_t = sorted([float(os.path.splitext(f)[0].split('_')[-1]) for f in os.listdir(img_dir) if os.path.isfile(os.path.join(img_dir, f))])
+            all_img_paths = [os.path.join(img_dir, "{}_{:.3f}.png".format(filename_prefix, t)) for t in all_t]
 
         images = [imageio.imread(img_path) for img_path in all_img_paths]
         imageio.mimsave(file_path, images, duration=1/fps)
         print("gif saved to {}".format(file_path))
 
     
-    def save_mp4(self, fps=30, img_dir=""):
+    def save_mp4(self, fps=30, img_dir="", args=None):
         filename = "{}.mp4".format(self.filename_prefix)
         file_path = os.path.join(os.getcwd(), self.output_dir, filename)
 
         # img paths
         all_img_paths = self.plotted_img_paths
+        all_img_paths = self.plotted_img_paths
         if img_dir:
-            all_img_paths = [os.path.join(img_dir, f) for f in os.listdir(img_dir) if os.path.isfile(os.path.join(img_dir, f))]
+            filename_prefix = os.path.split(img_dir)[-1]
+            all_t = sorted([float(os.path.splitext(f)[0].split('_')[-1]) for f in os.listdir(img_dir) if os.path.isfile(os.path.join(img_dir, f))])
+            all_img_paths = [os.path.join(img_dir, "{}_{:.3f}.png".format(filename_prefix, t)) for t in all_t]
         
         writer = imageio.get_writer(file_path, fps=20)
         for img_path in all_img_paths:
@@ -84,8 +89,9 @@ class Plot2DArray(object):
 
 
 if __name__ == "__main__":
-    img_dir = os.path.join(os.getcwd(), 'imgfiles', '07_23_16_58')
-    plotter = Plot2DArray()
+    filename_prefix = "expset(a)_eta_0.2_theta_0.56_Gamma_0.019"
+    img_dir = os.path.join(os.getcwd(), 'imgfiles', filename_prefix)
+    plotter = Plot2DArray(filename_prefix=filename_prefix)
     plotter.save_gif(img_dir=img_dir)
     plotter.save_mp4(img_dir=img_dir)
     
