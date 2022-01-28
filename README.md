@@ -1,4 +1,4 @@
-# crime_hotspots_simulation_analysis
+# crime-hotspots
 This repo implements two papers related to crime hotspots simulation and spatial analysis.
 
 ## Crime hotspots simulation
